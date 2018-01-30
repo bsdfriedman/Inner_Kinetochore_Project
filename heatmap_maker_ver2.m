@@ -113,3 +113,14 @@ end
 
 % sum the matrices to get the final heatmap
 protein_map = sum(plane,3);
+
+% mirror the heatmap
+prot_map_temp = zeros([size(protein_map,1) size(protein_map,2)]);
+prot_map_temp(((size(protein_map,1)+1)/2),:) = protein_map(((size(protein_map,1)+1)/2),:)*2;
+for z = 1:((size(protein_map,1)-1)/2)
+    prot_map_temp(z,:) = protein_map(z,:) + protein_map((size(protein_map,1)+1-z),:);
+    prot_map_temp((size(protein_map,1)+1-z),:) = protein_map(z,:) + protein_map((size(protein_map,1)+1-z),:);
+end
+
+% reassign the protein map
+protein_map = prot_map_temp;
