@@ -1,4 +1,4 @@
-function [IKK_measure,FWHM,counts] = IKK_run_ver3(data_cat,reference_spot)
+function [IKK_measure,FWHM,counts] = IKK_run_ver3(data_cat,reference_spot,red_dist_lim,green_dist_lim)
 %% Written by Brandon Friedman
 %% User Instructions
 % 1) The purpose of this code is to extract measurements on the
@@ -17,8 +17,6 @@ function [IKK_measure,FWHM,counts] = IKK_run_ver3(data_cat,reference_spot)
 %% Parameters
 start_pos = 2; % starting row in the data_full file (minimum value is 2)
 tilt_lim = 600; % number of nm allowed between chosen z-stacks
-red_dist_lim = [200 1200]; % range of acceptable red-red distances
-green_dist_lim = [200 1200]; % range of acceptable green-green distances
 gauss_fit_dim = 7; % dimensons of box used for gaussian fitting
 gauss_fit_tol = 2; % how many pixels away the new gaussian fitting coordinates can be from the bp
 gof_thresh = 0.80; % the lower limit for goodness of fit for gaussian fitting

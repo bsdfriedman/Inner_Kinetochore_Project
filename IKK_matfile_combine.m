@@ -136,7 +136,7 @@ for q = 1:size(matfiles,1)
         % choose the appropriate GFP and RFP files
         if filename_bi == 0 % "bi" is not in the filename
             GFP_file = strcat('GFP_',matfile_split{2},'.tif');
-            RFP_file = strcat('CFP_',matfile_split{2},'.tif');
+            RFP_file = strcat('RFP_',matfile_split{2},'.tif');
         else % "bi" is in the filename
             GFP_file = strcat('GFPbi_',matfile_split{2},'.tif');
             RFP_file = strcat('RFPbi_',matfile_split{2},'.tif');
