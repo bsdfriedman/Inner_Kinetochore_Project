@@ -2,7 +2,7 @@ function [protein_map] = heatmap_maker_ver2(data_cat,stationary_color)
 
 start_pos = 2; % starting row in the data_full file (minimum value is 2)
 tilt_lim = 600; % number of nm allowed between chosen z-stacks
-red_dist_lim = [0 2000]; % range of acceptable red-red distances
+red_dist_lim = [200 1200]; % range of acceptable red-red distances
 green_dist_lim = [0 2000]; % range of acceptable green-green distances
 gauss_fit_dim = 7; % dimensons of box used for gaussian fitting
 heatmap_size = 15; % size of the heatmap image

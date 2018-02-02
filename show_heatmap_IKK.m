@@ -1,7 +1,7 @@
 function show_heatmap_IKK(protein_map,pixsize,pos_protein,ref_protein)
 
 % this code displays the heatmap
-x = [-7 7]*pixsize; y = x;
+x = [-(size(protein_map,1)-1)/2 (size(protein_map,1)-1)/2]*pixsize; y = x;
 heatmap_disp = interp2(protein_map);
 imagesc(x,y,heatmap_disp);
 colormap hot;
