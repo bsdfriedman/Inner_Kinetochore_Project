@@ -2,8 +2,8 @@ function [protein_map] = heatmap_maker_ver2(data_cat,stationary_color)
 
 start_pos = 2; % starting row in the data_full file (minimum value is 2)
 tilt_lim = 600; % number of nm allowed between chosen z-stacks
-red_dist_lim = [0 2000]; % range of acceptable red-red distances
-green_dist_lim = [0 2000]; % range of acceptable green-green distances
+red_dist_lim = [200 1200]; % range of acceptable red-red distances
+green_dist_lim = [200 1200]; % range of acceptable green-green distances
 gauss_fit_dim = 7; % dimensons of box used for gaussian fitting
 heatmap_size = 15; % size of the heatmap image
 sf = 1; % scaling factor for pixels
@@ -53,10 +53,10 @@ for z = start_pos:size(data_cat.raw_data,1)
     GFP2 = data_cat.cropped_data{z,7}(:,:,g2_crop(3));
     
     % crop the images to an NxN matrix
-    RFP1_a = crop_image_IKK_ver3(RFP1, r1_crop, gauss_fit_dim, gauss_fit_dim);
-    RFP2_a = crop_image_IKK_ver3(RFP2, r2_crop, gauss_fit_dim, gauss_fit_dim);
-    GFP1_a = crop_image_IKK_ver3(GFP1, g1_crop, gauss_fit_dim, gauss_fit_dim);
-    GFP2_a = crop_image_IKK_ver3(GFP2, g2_crop, gauss_fit_dim, gauss_fit_dim);
+    RFP1_a = crop_image_IKK_ver3(RFP1, r1_crop, (gauss_fit_dim-1)/2, (gauss_fit_dim-1)/2);
+    RFP2_a = crop_image_IKK_ver3(RFP2, r2_crop, (gauss_fit_dim-1)/2, (gauss_fit_dim-1)/2);
+    GFP1_a = crop_image_IKK_ver3(GFP1, g1_crop, (gauss_fit_dim-1)/2, (gauss_fit_dim-1)/2);
+    GFP2_a = crop_image_IKK_ver3(GFP2, g2_crop, (gauss_fit_dim-1)/2, (gauss_fit_dim-1)/2);
     
     % find the maximum intensity of each image and make sure it's equal to the intensity of the middle pixel
     max_check_r1 = max(RFP1_a(:)) ~= r1(4);
