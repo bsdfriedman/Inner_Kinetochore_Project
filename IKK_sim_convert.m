@@ -159,18 +159,38 @@ for q = 1:size(recolor_idx,2)
     fclose('all');
 end
 
+% make a color file for the MT beads
+filename = sprintf('%s_colors_MT.txt',file_root_name{1});
+fid_out = fopen(filename,'w');
+
+% assign the mass colors
+mass_color_list_MT = mass_color_list;
+
+% change the appropriate colors in the mass color list
+for z = 1:size(MT_idx,1)
+    mass_color_list_MT(mass_num-MT_idx(z,1)) = 4;
+end
+
+for z = 1:size(mass_color_list_MT,1)
+    % print out the color names into the color file
+    fprintf(fid_out,'%d\r\n',mass_color_list_MT(z,1));
+end
+
+% close all the files
+fclose('all');
+
 %% THIS CODE IS USED TO TEST THE PROGRAM AND HAS BEEN COMMENTED OUT
 % for q = 1:size(beads_inward,2)
 %     % open up the file
 %     fid_in = fopen(infile);
-%
+%     
 %     % create the colors file
 %     filename = sprintf('%s_reprint_%d.out',file_root_name{1},beads_inward(q));
 %     fid_out = fopen(filename,'w');
-%
+%     
 %     % assign tline so that the lines can be looped through
 %     tline = fgetl(fid_in);
-%
+%     
 %     while ischar(tline) == 1
 %         if size(strfind(tline,'MassColors'),1) ~= 0
 %             % reprint the line
@@ -190,10 +210,43 @@ end
 %             tline = fgetl(fid_in);
 %         end
 %     end
-%
+%     
 %     % close all the files
 %     fclose('all');
 % end
+% 
+% % open up the file
+% fid_in = fopen(infile);
+% 
+% % create the colors file
+% filename = sprintf('%s_reprint_MT.out',file_root_name{1});
+% fid_out = fopen(filename,'w');
+% 
+% % assign tline so that the lines can be looped through
+% tline = fgetl(fid_in);
+% 
+% while ischar(tline) == 1
+%     if size(strfind(tline,'MassColors'),1) ~= 0
+%         % reprint the line
+%         fprintf(fid_out,'%s\r\n',tline);
+%         % loop to the next line
+%         tline = fgetl(fid_in);
+%         for z = 1:size(mass_color_list,1)
+%             % print out the color names into the color file
+%             fprintf(fid_out,'%d\r\n',mass_color_list_MT(z,1));
+%             % loop to the next line
+%             tline = fgetl(fid_in);
+%         end
+%     else
+%         % reprint the line
+%         fprintf(fid_out,'%s\r\n',tline);
+%         % loop to the next line
+%         tline = fgetl(fid_in);
+%     end
+% end
+% 
+% % close all the files
+% fclose('all');
 
 %% Performing the simulation measurements
 % preallocate the table for the recolored beads
