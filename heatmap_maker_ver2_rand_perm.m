@@ -114,8 +114,26 @@ for z = start_pos:size(data_cat.raw_data,1)
     end
 end
 
+% remove planes with all zeros
+plane_temp = zeros([heatmap_size heatmap_size sum(plane(:)),2]);
+plane_temp_counter = 1; % used to allocate planes to the temp plane
+
+% remove planes of all zero
+for z = 1:size(plane,3)
+    if sum(plane(:,:,z)) > 0
+        plane_temp(:,:,plane_temp_counter) = plane(:,:,z);
+        plane_temp_counter = plane_temp_counter + 1;
+    else
+    end
+end
+
+% reassign the plane
+clearvars plane;
+plane = plane_temp;
+
+% make sure the desired n is lower than the total n
 if desired_n > size(plane,3)*2
-    error('Your chosen n has to be an even number');
+    error('Your chosen n is larger than the total number possible');
 else
 end
 
