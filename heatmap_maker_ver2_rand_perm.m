@@ -115,7 +115,7 @@ for z = start_pos:size(data_cat.raw_data,1)
 end
 
 % remove planes with all zeros
-plane_temp = zeros([heatmap_size heatmap_size sum(plane(:)),2]);
+plane_temp = zeros([heatmap_size heatmap_size sum(plane(:))/2]);
 plane_temp_counter = 1; % used to allocate planes to the temp plane
 
 % remove planes of all zero
