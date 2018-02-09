@@ -120,7 +120,7 @@ plane_temp_counter = 1; % used to allocate planes to the temp plane
 
 % remove planes of all zero
 for z = 1:size(plane,3)
-    if sum(plane(:,:,z)) > 0
+    if sum(sum(plane(:,:,z))) > 0
         plane_temp(:,:,plane_temp_counter) = plane(:,:,z);
         plane_temp_counter = plane_temp_counter + 1;
     else
