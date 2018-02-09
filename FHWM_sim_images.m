@@ -18,9 +18,10 @@ image = crop_image_IKK_ver3(plane, [bp_X bp_Y], (mask_hy-1)/2, (mask_wy-1)/2);
 % log the image height
 hght = size(image,1);
 
-a = randi(120,15,7);
-image = image+a;
-imshow(image,[]);
+% % adds noise
+% a = randi(120,15,7);
+% image = image+a;
+% imshow(image,[]);
 
 % perform the FHWM calculation
 image_a = sum(image,2);
@@ -30,5 +31,3 @@ image_b = mat2gray(image_a);
 [g,gof] = fit(z,image_b,equ,'Lower',[0.7,((hght+1)/2)-(0.25*hght),1,0],'Upper',[1.3,((hght+1)/2)+(0.25*hght),hght*0.8,0.3],'StartPoint',[1,(hght+1)*0.5,hght*0.3,0]);
 coeff = coeffvalues(g);
 FWHM = (coeff(3)/sqrt(2)) * sqrt(8*log(2));
-
-n = 1;
