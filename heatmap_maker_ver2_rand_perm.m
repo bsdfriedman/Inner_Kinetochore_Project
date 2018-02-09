@@ -3,7 +3,7 @@ function [protein_map] = heatmap_maker_ver2_rand_perm(data_cat,stationary_color,
 start_pos = 2; % starting row in the data_full file (minimum value is 2)
 tilt_lim = 600; % number of nm allowed between chosen z-stacks
 gauss_fit_dim = 7; % dimensons of box used for gaussian fitting
-heatmap_size = 15; % size of the heatmap image
+heatmap_size = 21; % size of the heatmap image
 plane = zeros([heatmap_size heatmap_size (size(data_cat.raw_data,1)-1)]); % preallocate the planes
 
 if mod(heatmap_size,2) == 0
