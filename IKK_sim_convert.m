@@ -13,13 +13,21 @@ mass_num = str2double(mass_num);
 
 % log the time steps that will be used in the calculation
 [~,times] = system(sprintf('grep "Time " %s | gawk ''!(NR%%%d)''',infile,every_n_timesteps));
-time_name = strsplit(times,'\n')';
-time_name = time_name(~cellfun('isempty',time_name));
+time_name_temp = strsplit(times,'\n')';
+time_name_temp = time_name_temp(~cellfun('isempty',time_name_temp));
+
+% crop out unnecessary time points
+if mod(size(time_name_temp,1),2) == 0
+    time_name = time_name_temp(((size(time_name_temp,1)/2)+1):size(time_name_temp,1));
+else
+    time_name = time_name_temp(((size(time_name_temp,1)+1)/2):size(time_name_temp,1));
+end
 
 % parameters
 mass_mass = 3.38889e-020; % mass of a standard bead
 mass_multiplier = 10^10; % pinning mass
 ignore = 0; % how many time points you want to ignore
+mt_radius = 1.25*10^-7; % radius of microtubules
 
 % preallocate
 cen_idx = zeros([16 1]);
@@ -84,29 +92,22 @@ while ischar(tline) == 1
         end
         % loop to the next line
         tline = fgetl(fid_in);
-    elseif size(strfind(tline,'Time '),1) ~= 0
+    elseif max(strcmp(tline,time_name)) == 1
         % reprint the line
         fprintf(fid_out,'%s\r\n',tline);
-        tline_rec = tline;
         % loop to the next line
         tline = fgetl(fid_in);
         for z = 1:mass_num
             b = str2double(strsplit(tline))*10^6;
             % reprint the line with the new measurements
             fprintf(fid_out,'%0.6f %0.6f %0.6f\r\n',b(1),b(2),b(3));
-            if max(strcmp(tline_rec,time_name)) == 1
-                % log the coordinates
-                coords(z,1:3,time_counter) = str2double(strsplit(tline));
-            else
-            end
+            % log the coordinates
+            coords(z,1:3,time_counter) = str2double(strsplit(tline));
             % loop to the next line
             tline = fgetl(fid_in);
         end
-        if max(strcmp(tline_rec,time_name)) == 1
-            % increase the time counter by 1
-            time_counter = time_counter + 1;
-        else
-        end
+        % increase the time counter by 1
+        time_counter = time_counter + 1;
     else
         % loop to the next line
         tline = fgetl(fid_in);
@@ -183,14 +184,14 @@ fclose('all');
 % for q = 1:size(beads_inward,2)
 %     % open up the file
 %     fid_in = fopen(infile);
-%     
+%
 %     % create the colors file
 %     filename = sprintf('%s_reprint_%d.out',file_root_name{1},beads_inward(q));
 %     fid_out = fopen(filename,'w');
-%     
+%
 %     % assign tline so that the lines can be looped through
 %     tline = fgetl(fid_in);
-%     
+%
 %     while ischar(tline) == 1
 %         if size(strfind(tline,'MassColors'),1) ~= 0
 %             % reprint the line
@@ -210,21 +211,21 @@ fclose('all');
 %             tline = fgetl(fid_in);
 %         end
 %     end
-%     
+%
 %     % close all the files
 %     fclose('all');
 % end
-% 
+%
 % % open up the file
 % fid_in = fopen(infile);
-% 
+%
 % % create the colors file
 % filename = sprintf('%s_reprint_MT.out',file_root_name{1});
 % fid_out = fopen(filename,'w');
-% 
+%
 % % assign tline so that the lines can be looped through
 % tline = fgetl(fid_in);
-% 
+%
 % while ischar(tline) == 1
 %     if size(strfind(tline,'MassColors'),1) ~= 0
 %         % reprint the line
@@ -244,7 +245,7 @@ fclose('all');
 %         tline = fgetl(fid_in);
 %     end
 % end
-% 
+%
 % % close all the files
 % fclose('all');
 
@@ -370,11 +371,40 @@ MTpos_percent{2,1} = sum(sum(MT_measure > 0))/(size(MT_measure,1)*size(MT_measur
 MTpos_percent{2,2} = sum(sum(MT_measure < 0))/(size(MT_measure,1)*size(MT_measure,2)*size(MT_measure,3));
 MTpos_percent{2,3} = sum(sum(MT_measure == 0))/(size(MT_measure,1)*size(MT_measure,2)*size(MT_measure,3));
 
+% preallocate the bead radius table
+bead_rad_table = zeros([32 size(beads_inward,2) size(time_name,1)]);
+
+% calculate the bead radii
+for q = 1:size(time_name,1)
+    for z = 1:size(beads_inward,2)
+        for h = 1:16
+            bead_rad_table(h*2-1,z,q) = norm(bead_coords(h*2-1,2:3,z,q));
+            bead_rad_table(h*2,z,q) = norm(bead_coords(h*2,2:3,z,q));
+        end
+    end
+end
+
+% set up the output for bead radius
+bead_radius = cell([size(beads_inward,2)+2 2]);
+bead_radius{1,1} = 'Bead Position';
+bead_radius{1,2} = 'Average Radius (nm)';
+bead_radius{2,1} = 'MT';
+bead_radius{2,2} = mt_radius*10^9;
+
+% find the average radii for each chosen bead
+for z = 1:size(beads_inward,2)
+    bead_radius{z+2,1} = beads_inward(z);
+    bead_radius{z+2,2} = mean(mean(bead_rad_table(:,z,:)))*10^9;
+end
+
 % create the outputs
 output.cen_bead_dist_table = cen_bead_dist_table;
 output.cen_bead_xpos_table = cen_bead_xpos_table;
 output.MT_cen_xpos_table = MT_cen_xpos_table;
+output.bead_rad_table = bead_rad_table;
 output.cen_bead_dist = cen_bead_dist;
 output.cen_bead_xpos = cen_bead_xpos;
 output.xpos_percent = xpos_percent;
 output.MTpos_percent = MTpos_percent;
+output.bead_radius = bead_radius;
+
