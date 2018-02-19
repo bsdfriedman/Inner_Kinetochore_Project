@@ -108,6 +108,11 @@ while ischar(tline) == 1
         end
         % increase the time counter by 1
         time_counter = time_counter + 1;
+        if time_counter <= size(time_name,1)
+            % print a line space
+            fprintf(fid_out,'\r\n');
+        else
+        end
     else
         % loop to the next line
         tline = fgetl(fid_in);
