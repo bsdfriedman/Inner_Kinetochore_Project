@@ -19,6 +19,7 @@ start_pos = 2; % starting row in the data_full file (minimum value is 2)
 tilt_lim = 600; % number of nm allowed between chosen z-stacks
 gauss_fit_dim = 7; % dimensons of box used for gaussian fitting
 gauss_fit_tol = 2; % how many pixels away the new gaussian fitting coordinates can be from the bp
+bkd_calc_dim = [7 9]; % dimensions of the box used to calculate the background
 gof_thresh = 0.80; % the lower limit for goodness of fit for gaussian fitting
 padding = 15; % size of the padding for the logical rotation
 mask_hy = 15; % height of the mask for the Y-FWHM measurement
@@ -31,7 +32,7 @@ FWHM.R_im_cat = []; % used to make an aggregate FWHM measurement for the RFP
 FWHM.G_im_cat = []; % used to make an aggregate FWHM measurement for the GFP
 
 %% Initialization
-IKK_measure.meas_bp = {'r1_new','r2_new','g1_new','g2_new','Step Size (nm)','Pixel Size (nm)','GFP_image_stack','RFP_image_stack','gg_dist','rr_dist'};
+IKK_measure.meas_bp = {'r1_new','r2_new','g1_new','g2_new','Step Size (nm)','Pixel Size (nm)','GFP_image_stack','RFP_image_stack','gg_dist','rr_dist','GFP1_bkd','GFP2_bkd','RFP1_bkd','RFP2_bkd'};
 IKK_measure.meas_gauss = {'r1_new','r2_new','g1_new','g2_new','Step Size (nm)','Pixel Size (nm)','GFP_image_stack','RFP_image_stack','gg_dist','rr_dist'};
 counts.bp_success = 0; % count of cells where the bp measurement was successful
 counts.bp_fail = 0; % count of cells where the bp measurement failed
@@ -104,11 +105,34 @@ for z = start_pos:size(data_cat.raw_data,1)
         
         % if the cell falls within the limits and is the brighest local pixel, then continue
         if limits + max_check == 0
+            % make the smaller region for the background measurement
+            RFP1_bkd_s = crop_image_IKK_ver3(RFP1, r1_crop, (bkd_calc_dim(1)-1)/2, (bkd_calc_dim(1)-1)/2);
+            RFP2_bkd_s = crop_image_IKK_ver3(RFP2, r2_crop, (bkd_calc_dim(1)-1)/2, (bkd_calc_dim(1)-1)/2);
+            GFP1_bkd_s = crop_image_IKK_ver3(GFP1, g1_crop, (bkd_calc_dim(1)-1)/2, (bkd_calc_dim(1)-1)/2);
+            GFP2_bkd_s = crop_image_IKK_ver3(GFP2, g2_crop, (bkd_calc_dim(1)-1)/2, (bkd_calc_dim(1)-1)/2);
+            
+            % make the larger region for the background measurement
+            RFP1_bkd_l = crop_image_IKK_ver3(RFP1, r1_crop, (bkd_calc_dim(2)-1)/2, (bkd_calc_dim(2)-1)/2);
+            RFP2_bkd_l = crop_image_IKK_ver3(RFP2, r2_crop, (bkd_calc_dim(2)-1)/2, (bkd_calc_dim(2)-1)/2);
+            GFP1_bkd_l = crop_image_IKK_ver3(GFP1, g1_crop, (bkd_calc_dim(2)-1)/2, (bkd_calc_dim(2)-1)/2);
+            GFP2_bkd_l = crop_image_IKK_ver3(GFP2, g2_crop, (bkd_calc_dim(2)-1)/2, (bkd_calc_dim(2)-1)/2);
+            
+            % calculate the backgrounds
+            RFP1_bkd = (RFP1_bkd_l(:)-RFP1_bkd_s(:))/(bkd_calc_dim(2)^2-bkd_calc_dim(1)^2);
+            RFP2_bkd = (RFP2_bkd_l(:)-RFP2_bkd_s(:))/(bkd_calc_dim(2)^2-bkd_calc_dim(1)^2);
+            GFP1_bkd = (GFP1_bkd_l(:)-GFP1_bkd_s(:))/(bkd_calc_dim(2)^2-bkd_calc_dim(1)^2);
+            GFP2_bkd = (GFP2_bkd_l(:)-GFP2_bkd_s(:))/(bkd_calc_dim(2)^2-bkd_calc_dim(1)^2);
+            
             %% RR and GG Logged for Brightest Pixel that Meet Limit Requirements
             meas_bp_size = size(IKK_measure.meas_bp,1);
             IKK_measure.meas_bp(meas_bp_size+1,1:8) = data_cat.cropped_data(z,1:8);
             IKK_measure.meas_bp{meas_bp_size+1,9} = gg_dist;
             IKK_measure.meas_bp{meas_bp_size+1,10} = rr_dist;
+            IKK_measure.meas_bp{meas_bp_size+1,11} = GFP1_bkd;
+            IKK_measure.meas_bp{meas_bp_size+1,12} = GFP2_bkd;
+            IKK_measure.meas_bp{meas_bp_size+1,13} = RFP1_bkd;
+            IKK_measure.meas_bp{meas_bp_size+1,14} = RFP2_bkd;
+            
             % count and display the successful recording
             counts.bp_success = counts.bp_success + 1;
             disp('BP measurements were successfully recorded');
@@ -285,20 +309,20 @@ FWHM.G_mean = mean(FWHM.G_y);
 %     % sum the images to get a composite
 %     R_agg_im = sum(FWHM.R_im_cat,3);
 %     G_agg_im = sum(FWHM.G_im_cat,3);
-%     
+%
 %     % mirror the RFP
 %     R_agg_im((size(R_agg_im,1)+1)/2,:) = R_agg_im((size(R_agg_im,1)+1)/2,:)*2;
 %     R_agg_im(1:(((size(R_agg_im,1)+1)/2)-1),:) = R_agg_im(1:(((size(R_agg_im,1)+1)/2)-1),:) + flipud(R_agg_im((((size(R_agg_im,1)+1)/2)+1):size(R_agg_im,1),:));
 %     R_agg_im((((size(R_agg_im,1)+1)/2)+1):size(R_agg_im,1),:) = flipud(R_agg_im(1:(((size(R_agg_im,1)+1)/2)-1),:));
-%     
+%
 %     % mirror the GFP
 %     G_agg_im((size(G_agg_im,1)+1)/2,:) = G_agg_im((size(G_agg_im,1)+1)/2,:)*2;
 %     G_agg_im(1:(((size(G_agg_im,1)+1)/2)-1),:) = G_agg_im(1:(((size(G_agg_im,1)+1)/2)-1),:) + flipud(G_agg_im((((size(G_agg_im,1)+1)/2)+1):size(G_agg_im,1),:));
 %     G_agg_im((((size(G_agg_im,1)+1)/2)+1):size(G_agg_im,1),:) = flipud(G_agg_im(1:(((size(G_agg_im,1)+1)/2)-1),:));
-%     
+%
 %     % calculate the aggregate FHWM values
 %     [FWHM.R_agg_y] = FWHM_calculate_y_IKK_ver3(R_agg_im,size(R_agg_im,1),gof_thresh);
 %     [FWHM.G_agg_y] = FWHM_calculate_y_IKK_ver3(G_agg_im,size(G_agg_im,1),gof_thresh);
-%     
+%
 % else
 % end
