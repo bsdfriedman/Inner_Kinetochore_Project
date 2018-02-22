@@ -118,10 +118,10 @@ for z = start_pos:size(data_cat.raw_data,1)
             GFP2_bkd_l = crop_image_IKK_ver3(GFP2, g2_crop, (bkd_calc_dim(2)-1)/2, (bkd_calc_dim(2)-1)/2);
             
             % calculate the backgrounds
-            RFP1_bkd = (RFP1_bkd_l(:)-RFP1_bkd_s(:))/(bkd_calc_dim(2)^2-bkd_calc_dim(1)^2);
-            RFP2_bkd = (RFP2_bkd_l(:)-RFP2_bkd_s(:))/(bkd_calc_dim(2)^2-bkd_calc_dim(1)^2);
-            GFP1_bkd = (GFP1_bkd_l(:)-GFP1_bkd_s(:))/(bkd_calc_dim(2)^2-bkd_calc_dim(1)^2);
-            GFP2_bkd = (GFP2_bkd_l(:)-GFP2_bkd_s(:))/(bkd_calc_dim(2)^2-bkd_calc_dim(1)^2);
+            RFP1_bkd = (sum(RFP1_bkd_l(:))-sum(RFP1_bkd_s(:)))/(bkd_calc_dim(2)^2-bkd_calc_dim(1)^2);
+            RFP2_bkd = (sum(RFP2_bkd_l(:))-sum(RFP2_bkd_s(:)))/(bkd_calc_dim(2)^2-bkd_calc_dim(1)^2);
+            GFP1_bkd = (sum(GFP1_bkd_l(:))-sum(GFP1_bkd_s(:)))/(bkd_calc_dim(2)^2-bkd_calc_dim(1)^2);
+            GFP2_bkd = (sum(GFP2_bkd_l(:))-sum(GFP2_bkd_s(:)))/(bkd_calc_dim(2)^2-bkd_calc_dim(1)^2);
             
             %% RR and GG Logged for Brightest Pixel that Meet Limit Requirements
             meas_bp_size = size(IKK_measure.meas_bp,1);
