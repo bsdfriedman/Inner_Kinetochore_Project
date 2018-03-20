@@ -57,7 +57,7 @@ for z = start_pos:size(data_cat.raw_data,1)
     if size(r1,1) ~= 0 && size(r2,1) ~= 0 && size(g1,1) ~= 0 && size(g2,1) ~= 0
         
         % if the spots were misclicked, swap them
-        if distance_between_IKK_ver3(r1,g1) <= distance_between_IKK_ver3(r1,g2)
+        if norm(r1-g1) <= norm(r1-g2)
         else
             g1 = data_cat.raw_data{z,4};
             g2 = data_cat.raw_data{z,3};
@@ -78,7 +78,7 @@ for z = start_pos:size(data_cat.raw_data,1)
         g2_crop = data_cat.cropped_data{z,4};
         
         % if the spots were misclicked, swap them
-        if distance_between_IKK_ver3(r1_crop,g1_crop) <= distance_between_IKK_ver3(r1_crop,g2_crop)
+        if norm(r1_crop-g1_crop) <= norm(r1_crop-g2_crop)
         else
             g1_crop = data_cat.cropped_data{z,4};
             g2_crop = data_cat.cropped_data{z,3};

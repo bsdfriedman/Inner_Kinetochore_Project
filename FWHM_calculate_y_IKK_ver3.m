@@ -19,7 +19,7 @@ coeff = coeffvalues(g);
 
 if gof.rsquare > gof_thresh
     % if the gof is high enough, convert the c coeff to FWHM
-    FWHM = (coeff(3)/sqrt(2)) * sqrt(8*log(2));
+    FWHM = abs((coeff(3)/sqrt(2)) * sqrt(8*log(2)));
 else
     % if it doesn't, log a dummy variable that will be excluded
     FWHM = -1;
