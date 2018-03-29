@@ -1,8 +1,8 @@
 function [p_vals] = ndc80_matching_phase_1_analysis(cells_FWHM,sim_FWHM)
 
 % parameters
-min_radius = 100; % minimum radius in nm
-max_radius = 140; % minimum radius in nm
+min_radius = 120; % minimum radius in nm
+max_radius = 160; % minimum radius in nm
 radius_step_size = 1; % increase in radius with each step
 
 % load the step-sizes to populaiton the table

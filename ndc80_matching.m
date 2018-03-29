@@ -7,10 +7,10 @@ function ndc80_matching
 % parameters
 num_kin = 16; % number of kinetochores
 theta = (2*pi)/16; % angle of rotation
-min_radius = 100; % minimum radius in nm
-max_radius = 140; % minimum radius in nm
+min_radius = 120; % minimum radius in nm
+max_radius = 160; % minimum radius in nm
 radius_step_size = 1; % increase in radius with each step
-create_outfile = 0; % this is 0 if you don't want an out file and 1 if you do
+create_outfile = 1; % this is 0 if you don't want an out file and 1 if you do
 mass_mass = 3.38889e-020; % mass of a standard bead
 mass_multiplier = 10^10; % pinning mass
 

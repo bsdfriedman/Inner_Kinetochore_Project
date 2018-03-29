@@ -13,9 +13,9 @@ function ndc80_matching_theta
 pivot_angle = 5; % the angle in degrees that the large ring pivots upwards
 
 % parameters
-ndc80_radius_nm = 111; % N-ndc80 radius in nm
+ndc80_radius_nm = 130; % N-ndc80 radius in nm
 theta_1 = (2*pi)/16; % angle of rotation to make circles of 16 beads
-kin_length = 15; % length of the kinetochore in nm
+kin_length = 30; % length of the kinetochore in nm
 num_kin = 16; % number of kinetochores
 create_outfile = 1; % this is 0 if you don't want an out file and 1 if you do
 mass_mass = 3.38889e-020; % mass of a standard bead

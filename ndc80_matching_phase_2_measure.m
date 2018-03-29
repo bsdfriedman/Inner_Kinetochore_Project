@@ -2,7 +2,9 @@ function [ndc80_phase2_output] = ndc80_matching_phase_2_measure(tiff_file_dir)
 
 % parameters
 brightest_plane = 4; % this is the plane with the brightest pixel
-gauss_fit_dim = 7; % size of the matrix used for gaussian fitting
+gauss_fit_dim = 15; % size of the matrix used for gaussian fitting
+gauss_fit_dim_h = 15; % height of the matrix used for FHWM gaussian fitting
+gauss_fit_dim_w = 7; % width of the matrix used for FWHM gaussian fitting
 num_iterations = 250; % the number of times I add noise to the raw image
 intens_frac = 3; % fraction of the range of intensity values used to make the noise
 gof_thresh = 0.8; % threshold for the gaussian fitting to find the FWHM values
@@ -26,8 +28,8 @@ folder_rad = sort(folder_rad);
 folder_rad = folder_rad(~isnan(folder_rad));
 
 % preallocate
-ndc80_phase2_output.images_cropped = zeros([gauss_fit_dim gauss_fit_dim (size(folder_rad,1)+1)*2]);
-ndc80_phase2_output.images_cropped_n = zeros([gauss_fit_dim gauss_fit_dim num_iterations (size(folder_rad,1)+1)*2]);
+ndc80_phase2_output.images_cropped = zeros([gauss_fit_dim_h gauss_fit_dim_w (size(folder_rad,1)+1)*2]);
+ndc80_phase2_output.images_cropped_n = zeros([gauss_fit_dim_h gauss_fit_dim_w num_iterations (size(folder_rad,1)+1)*2]);
 ndc80_phase2_output.FWHM_table = zeros([(size(folder_rad,1)+1) num_iterations*2]);
 ndc80_phase2_output.spot_idx_bp = cell([size(folder_rad,1) num_iterations]);
 ndc80_phase2_output.spot_idx_gauss = cell([size(folder_rad,1) num_iterations]);
@@ -85,8 +87,8 @@ for z = 1:size(folder_rad,1)+1
     spot_idx_2 = [pix_max_cols_2(1),pix_max_rows_2(1)];
     
     % crop the image down to a smaller region to find the FWHM
-    im_plane_c1 = crop_image_IKK_ver3(im_plane, spot_idx_1, (gauss_fit_dim-1)/2, (gauss_fit_dim-1)/2);
-    im_plane_c2 = crop_image_IKK_ver3(im_plane, spot_idx_2, (gauss_fit_dim-1)/2, (gauss_fit_dim-1)/2);
+    im_plane_c1 = crop_image_IKK_ver3(im_plane, spot_idx_1, (gauss_fit_dim_h-1)/2, (gauss_fit_dim_w-1)/2);
+    im_plane_c2 = crop_image_IKK_ver3(im_plane, spot_idx_2, (gauss_fit_dim_h-1)/2, (gauss_fit_dim_w-1)/2);
     
     % log the cropped images (without noise)
     ndc80_phase2_output.images_full(:,:,z) = im_plane;
@@ -99,7 +101,7 @@ for z = 1:size(folder_rad,1)+1
         noise_level = round((max(im_plane_c1(:))-min(im_plane_c1(:)))/intens_frac);
         
         % create an array of noise to add to the image
-        noise = randi([0 noise_level],gauss_fit_dim,gauss_fit_dim);
+        noise = randi([0 noise_level],gauss_fit_dim_h,gauss_fit_dim_w);
         
         % add the noise to the image
         im_plane_n1 = im_plane_c1 + noise;
@@ -111,8 +113,8 @@ for z = 1:size(folder_rad,1)+1
         
         %% Calculate the FWHM
         % calculate the FWHM in y
-        [FWHM_val_1] = FWHM_calculate_y_IKK_ver3(im_plane_n1,gauss_fit_dim,gof_thresh);
-        [FWHM_val_2] = FWHM_calculate_y_IKK_ver3(im_plane_n2,gauss_fit_dim,gof_thresh);
+        [FWHM_val_1] = FWHM_calculate_y_IKK_ver3(im_plane_n1,gauss_fit_dim_h,gof_thresh);
+        [FWHM_val_2] = FWHM_calculate_y_IKK_ver3(im_plane_n2,gauss_fit_dim_h,gof_thresh);
         
         % log the FWHM value
         ndc80_phase2_output.FWHM_table(z,y*2-1) = FWHM_val_1*pixel_size;
