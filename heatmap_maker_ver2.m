@@ -3,7 +3,7 @@ function [protein_map] = heatmap_maker_ver2(data_cat,stationary_color,red_dist_l
 start_pos = 2; % starting row in the data_full file (minimum value is 2)
 tilt_lim = 600; % number of nm allowed between chosen z-stacks
 gauss_fit_dim = 7; % dimensons of box used for gaussian fitting
-heatmap_size = 35; % size of the heatmap image
+heatmap_size = 25; % size of the heatmap image
 plane = zeros([heatmap_size heatmap_size (size(data_cat.raw_data,1)-1)]); % preallocate the planes
 
 if mod(heatmap_size,2) == 0
@@ -85,21 +85,20 @@ for z = start_pos:size(data_cat.raw_data,1)
     % if the cell falls within the limits and is the brighest local pixel, then continue
     if limits + max_check == 0
         % rotate and round the coordinates
-        [theta] = angle_between_IKK_ver3(s1, s2);
+        [theta] = deg2rad(angle_between_IKK_ver3(s1, s2));
         rot_mat = [cos(-theta),-sin(-theta);sin(-theta),cos(-theta)];
         s2_rot = round(rot_mat*s2_new')';
         d1_rot = round(rot_mat*d1_new')';
         d2_rot = round(rot_mat*d2_new')';
         
         % flip the spots
-        d1_fix(1) = abs(d1_rot(1));
         d2_fix = d2_rot-s2_rot;
-        d2_fix(1) = abs(d2_fix(1));
+        d2_fix(1) = d2_fix(1)*-1;
         
         % plot these two spots on the heatmap plane
         mid = (heatmap_size+1)/2;
-        d1_plot = d1_fix + [mid 0];
-        d2_plot = d2_fix + [mid 0];
+        d1_plot = d1_rot + mid;
+        d2_plot = d2_fix + mid;
         
         % add the spots to the heatmap
         plane(d1_plot(2),d1_plot(1),z-1) = plane(d1_plot(2),d1_plot(1),z-1) + 1;
