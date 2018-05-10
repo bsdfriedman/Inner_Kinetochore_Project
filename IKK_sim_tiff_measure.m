@@ -9,7 +9,8 @@ gof_thresh = 0.5; % threshold for goodness of fit, this should be deliberately l
 
 % split the tiff directory to get the tiff string
 tiff_dir_split = strsplit(tiff_dir,sprintf('%s',filesep));
-tiff_str = tiff_dir_split{size(tiff_dir_split,2)};
+tiff_str_split = strsplit(tiff_dir_split{size(tiff_dir_split,2)},'_');
+tiff_str = sprintf('%s_%s_%s_%s',tiff_str_split{1},tiff_str_split{2},tiff_str_split{3},tiff_str_split{4});
 
 %% Identify the bp and gauss coordinates, and the KK distances
 % loop through all the folders and collect the tiffs you want
